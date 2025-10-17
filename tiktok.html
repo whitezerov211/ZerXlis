@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Downloader</title>
+
+  <!-- Icon -->
+  <link rel="icon" href="https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png" />
+  <link rel="apple-touch-icon" href="https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png" />
+
+  <!-- Font & AOS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
+
+  <style>
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at 20% 20%, #0b0c2a, #000);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      flex-direction: column;
+    }
+    canvas#stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px) saturate(160%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 20px rgba(0,255,255,0.08);
+      padding: 40px 30px;
+      width: 95%; max-width: 520px;
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+    h1 { font-size: 2rem; color: #00f2ea; text-shadow: 0 0 10px rgba(0,242,234,0.3); margin-bottom: 10px; }
+    p { color: #ccc; margin-bottom: 18px; }
+    input {
+      width: 100%; padding: 12px 14px; border: none; border-radius: 10px;
+      font-size: 16px; margin-bottom: 12px; background: rgba(255,255,255,0.12);
+      color: white; text-align: center; outline: none;
+    }
+    button {
+      border: none; border-radius: 10px; padding: 12px 28px;
+      font-weight: 600; cursor: pointer; font-size: 15px;
+      background: linear-gradient(135deg, #00f2ea, #00d4c5);
+      color: #111; box-shadow: 0 0 10px rgba(0,242,234,0.3);
+    }
+    button:hover { transform: scale(1.06); box-shadow: 0 0 20px rgba(0,242,234,0.4); }
+    .result {
+      margin-top: 25px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 15px; padding: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    }
+    video, img { width: 100%; border-radius: 12px; margin-top: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; padding: 10px 18px;
+      border-radius: 10px; text-decoration: none; font-weight: 600;
+      font-size: 15px; cursor: pointer; border: none;
+      transition: 0.3s ease;
+    }
+    .download-btn { background: linear-gradient(135deg, #ff0050, #ff3366); color: white; }
+    .audio-btn { background: linear-gradient(135deg, #00d4ff, #0077ff); color: white; }
+    .photo-btn { background: linear-gradient(135deg, #00f2ea, #00d4c5); color: #111; }
+    .btn:hover { transform: scale(1.07); }
+    footer { margin-top: 20px; font-size: 14px; color: #aaa; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <div class="card" data-aos="fade-up">
+    <h1>TikTok Downloader</h1>
+    <p>Unduh video, audio, atau foto dari TikTok</p>
+
+    <input id="url" type="text" placeholder="Tempelkan link TikTok di sini..." />
+    <button id="getData">Cari</button>
+
+    <div id="result" class="result"></div>
+    <footer>Made with by <b>Muhlis V2.7</b></footer>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 1000, once: true });
+
+    const resultDiv = document.getElementById("result");
+    const getDataBtn = document.getElementById("getData");
+
+    // 🧩 Fungsi download langsung
+    async function directDownload(url, filename) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        alert("❌ Gagal mengunduh file.");
+      }
+    }
+
+    getDataBtn.onclick = async () => {
+      const link = document.getElementById("url").value.trim();
+      if (!link) return resultDiv.innerHTML = "<p>⚠️ Masukkan URL TikTok terlebih dahulu.</p>";
+
+      resultDiv.innerHTML = "<p>⏳ Mengambil data...</p>";
+
+      try {
+        const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(link)}`);
+        const json = await res.json();
+
+        if (json.code !== 0) {
+          resultDiv.innerHTML = "<p>❌ Gagal mengambil data. Coba URL lain.</p>";
+          return;
+        }
+
+        const data = json.data;
+        let html = `<h3>${data.title || "Tanpa Judul"}</h3>`;
+
+        // Jika konten foto
+        if (data.images && data.images.length > 0) {
+          html += `<p>🖼️ Konten foto (${data.images.length} gambar)</p>`;
+          data.images.forEach((img, i) => {
+            html += `
+              <img src="${img}" alt="Foto ${i+1}">
+              <button class="btn photo-btn" onclick="directDownload('${img}','tiktok-photo-${i+1}.jpg')">📥 Unduh Foto ${i+1}</button>
+            `;
+          });
+        } 
+        // Jika video
+        else if (data.play) {
+          html += `
+            <video controls src="${data.play}"></video>
+            <button class="btn download-btn" onclick="directDownload('${data.play}','tiktok-video.mp4')">📥 Unduh Video</button>
+          `;
+        }
+
+        // Audio
+        if (data.music) {
+          html += `<br><button class="btn audio-btn" onclick="directDownload('${data.music}','tiktok-audio.mp3')">🎵 Unduh Audio</button>`;
+        }
+
+        html += `<p>👤 ${data.author.nickname} (@${data.author.unique_id})</p>`;
+        resultDiv.innerHTML = html;
+      } catch (e) {
+        console.error(e);
+        resultDiv.innerHTML = "<p>❌ Terjadi kesalahan, coba lagi nanti.</p>";
+      }
+    };
+
+    // 🌠 Efek bintang jatuh
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+    window.onresize=resize;resize();
+    function createStar(){return{x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:Math.random()*2,speedX:Math.random()*1-0.5,speedY:Math.random()*1+0.5};}
+    for(let i=0;i<150;i++)stars.push(createStar());
+    function animateStars(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="rgba(255,255,255,0.9)";
+      stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();s.x+=s.speedX;s.y+=s.speedY;if(s.y>canvas.height){s.x=Math.random()*canvas.width;s.y=0;}});
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>selamat datang</title>
+
+  <!-- 🖼️ Favicon dan Icon untuk HP -->
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png">
+  <link rel="apple-touch-icon" href="https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png">
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Font & AOS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      background: radial-gradient(circle at 20% 20%, #0b0c2a, #000);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    canvas#stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.08);
+      padding: 40px 30px;
+      max-width: 520px;
+      width: 90%;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 35px rgba(0, 242, 234, 0.15);
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: url('https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png') center/cover no-repeat;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 20px rgba(0, 242, 234, 0.4);
+      border: 2px solid rgba(255,255,255,0.25);
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      color: #00f2ea;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(0, 242, 234, 0.3);
+    }
+
+    p {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      color: #ccc;
+      margin-bottom: 25px;
+    }
+
+    .btn-start {
+      display: inline-block;
+      background-color: #00f2ea;
+      border: none;
+      color: #111;
+      padding: 12px 35px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px rgba(0,242,234,0.25), 0 0 20px rgba(0,242,234,0.15);
+      animation: pulse 3s infinite ease-in-out;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 15px rgba(0,255,255,0.35), 0 0 25px rgba(0,255,255,0.2);
+    }
+
+    footer {
+      margin-top: 25px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(0,242,234,0.25), 0 0 20px rgba(0,242,234,0.15); }
+      50% { box-shadow: 0 0 18px rgba(0,255,255,0.35), 0 0 30px rgba(0,255,255,0.2); }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 25px 18px; border-radius: 15px; }
+      .logo { width: 80px; height: 80px; }
+      .btn-start { padding: 10px 25px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <div class="card" data-aos="fade-up">
+    <div class="logo"></div>
+    <h1>Selamat Datang</h1>
+    <p>Nikmati pengalaman unduh video TikTok tanpa watermark dengan mudah & cepat</p>
+    <a href="tiktok.html" class="btn-start">Mulai Sekarang</a>
+    <footer>Made with by <b>Muhlis V2.4</b></footer>
+  </div>
+
+  <!-- Script -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 1000, once: true });
+
+    // 🌠 Efek bintang jatuh
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.onresize = resize;
+    resize();
+
+    function createStar() {
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2,
+        speedX: Math.random() * 1 - 0.5,
+        speedY: Math.random() * 1 + 0.5
+      };
+    }
+
+    for (let i = 0; i < 150; i++) stars.push(createStar());
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.x += star.speedX;
+        star.y += star.speedY;
+        if (star.y > canvas.height) {
+          star.x = Math.random() * canvas.width;
+          star.y = 0;
+        }
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+  </script>
+</body>
+</html>
