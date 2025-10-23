@@ -1,7 +1,7 @@
 {
   "name": "Tiktok Downloader",
   "short_name": "Muhlis Host",
-  "start_url": "index.html",
+  "start_url": "splash.html",
   "display": "standalone",
   "background_color": "#0b0c2a",
   "theme_color": "#00f2ea",
@@ -18,3 +18,4 @@
     }
   ]
 }
+
